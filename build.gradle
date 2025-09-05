@@ -1,0 +1,55 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.3.2'
+	id 'io.spring.dependency-management' version '1.1.5'
+}
+
+group = "com.example"
+version = "0.0.1-SNAPSHOT"
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+}
+
+
+repositories {
+	mavenCentral()
+	maven {
+		url = uri("https://jitpack.io")
+	}
+}
+
+
+ext {
+	set('springAiVersion', "1.0.1")   // 👈 must be outside repositories
+}
+
+dependencies {
+	// Spring Boot
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// PostgreSQL (updated version for Java 21)
+	implementation 'org.postgresql:postgresql:42.7.3'
+
+	// Spring AI (let BOM manage versions, no explicit :0.8.1 here)
+	implementation 'org.springframework.ai:spring-ai-starter-mcp-server'
+	//implementation 'org.springframework.ai:spring-ai-ollama-spring-boot-starter'
+	runtimeOnly 'com.h2database:h2'
+	// Testing
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'com.h2database:h2'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
