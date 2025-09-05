@@ -20,4 +20,10 @@ public class ChatController {
         ChatResponse response = chatService.handleUserMessage(request);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/user-request")
+    public ResponseEntity<ChatResponse> getChat() {
+        ChatResponse response = chatService.handleUserMessage();
+        return ResponseEntity.ok(response);
+    }
 }

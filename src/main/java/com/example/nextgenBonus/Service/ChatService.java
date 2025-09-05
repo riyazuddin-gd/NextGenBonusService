@@ -8,7 +8,12 @@ import org.springframework.stereotype.Service;
 public class ChatService {
 
     public ChatResponse handleUserMessage(ChatRequest chatRequest){
-        ChatResponse chatResponse = new ChatResponse("tst") ;
+        ChatResponse chatResponse = new ChatResponse("Hello") ;
+        return chatResponse;
+    }
+
+    public ChatResponse handleUserMessage(){
+        ChatResponse chatResponse = new ChatResponse("Hello World") ;
         return chatResponse;
     }
 }
