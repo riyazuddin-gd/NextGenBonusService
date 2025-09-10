@@ -1,43 +1,38 @@
 package com.example.nextgenBonus.Entities;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "orders")  // lowercase for PostgreSQL
+@Table(name = "orders")  // matches your PostgreSQL table name "orders"
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
-    private String orderId;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)  // many orders belong to one member
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @Column(nullable = false)
-    private LocalDateTime createdDate = LocalDateTime.now();
+    @Column(name = "created_date", nullable = false)
+    private LocalDateTime createdDate;
 
-    private Double orderCC = 0.0;
+    @Column(name = "order_cc", precision = 10, scale = 2, nullable = false)
+    private BigDecimal orderCC;
 
-    // ----- Getters and Setters -----
+    // Constructors
+    public Order() {
+    }
+
+    // Getters and setters
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
     }
 
     public Member getMember() {
@@ -56,11 +51,11 @@ public class Order {
         this.createdDate = createdDate;
     }
 
-    public Double getOrderCC() {
+    public BigDecimal getOrderCC() {
         return orderCC;
     }
 
-    public void setOrderCC(Double orderCC) {
+    public void setOrderCC(BigDecimal orderCC) {
         this.orderCC = orderCC;
     }
 }

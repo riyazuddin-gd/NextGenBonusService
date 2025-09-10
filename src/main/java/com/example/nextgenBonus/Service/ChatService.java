@@ -6,9 +6,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ChatService {
+//    private final OpenAIService openAIService;
+//
+//    public ChatService(OpenAIService openAIService) {
+//        this.openAIService = openAIService;
+//    }
 
     public ChatResponse handleUserMessage(ChatRequest chatRequest){
-        ChatResponse chatResponse = new ChatResponse("Hello") ;
+        ChatResponse chatResponse = new ChatResponse("Hello "+chatRequest.getMemberId()) ;
         return chatResponse;
     }
 

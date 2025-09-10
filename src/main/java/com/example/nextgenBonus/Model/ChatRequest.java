@@ -1,17 +1,22 @@
 package com.example.nextgenBonus.Model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ChatRequest {
-    private Long memberId;
+    @JsonProperty("memberId")
+    private String memberId;
+
+    @JsonProperty("message")
     private String message;
 
     public ChatRequest() {
     }
 
-    public Long getMemberId() {
+    public String getMemberId() {
         return memberId;
     }
 
-    public void setMemberId(Long memberId) {
+    public void setMemberId(String memberId) {
         this.memberId = memberId;
     }
 
@@ -21,5 +26,13 @@ public class ChatRequest {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    @Override
+    public String toString() {
+        return "ChatRequest{" +
+                "memberId=" + memberId +
+                ", message='" + message + '\'' +
+                '}';
     }
 }
