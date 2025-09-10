@@ -110,13 +110,8 @@ public class ChatController {
     }
     @GetMapping("/predictive/{cc}")
     public ResponseEntity<PredictionModel> chat(@PathVariable Long cc) throws JsonProcessingException {
-        // Check if conversation already exists for this user
-            // Initialize conversation once with bonusData
 
-
-        // Always ask with user message (no bonus data again)
         PredictionModel response = openAIService.askPredictive(cc);
-
 
         return ResponseEntity.ok(response);
     }
