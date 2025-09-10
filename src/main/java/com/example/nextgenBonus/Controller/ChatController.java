@@ -110,7 +110,6 @@ public class ChatController {
     }
     @GetMapping("/predictive/{cc}")
     public ResponseEntity<PredictionModel> chat(@PathVariable Long cc) throws JsonProcessingException {
-
         PredictionModel response = openAIService.askPredictive(cc);
 
         return ResponseEntity.ok(response);
