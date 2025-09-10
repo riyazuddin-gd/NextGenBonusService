@@ -4,6 +4,7 @@ import com.example.nextgenBonus.Entities.Member;
 import com.example.nextgenBonus.Model.ChatRequest;
 import com.example.nextgenBonus.Model.ChatResponse;
 import com.example.nextgenBonus.Model.Downline;
+import com.example.nextgenBonus.Model.PredictionModel;
 import com.example.nextgenBonus.Repository.MemberRepository;
 import com.example.nextgenBonus.Service.ChatService;
 //import com.example.nextgenBonus.Service.OpenAIService;
@@ -104,6 +105,18 @@ public class ChatController {
 
         ChatResponse response = new ChatResponse();
         response.setReply(answer);
+
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/predictive/{cc}")
+    public ResponseEntity<PredictionModel> chat(@PathVariable Long cc) throws JsonProcessingException {
+        // Check if conversation already exists for this user
+            // Initialize conversation once with bonusData
+
+
+        // Always ask with user message (no bonus data again)
+        PredictionModel response = openAIService.askPredictive(cc);
+
 
         return ResponseEntity.ok(response);
     }

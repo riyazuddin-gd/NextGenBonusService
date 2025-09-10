@@ -85,6 +85,7 @@ package com.example.nextgenBonus.Client;
 //}
 
 
+import com.example.nextgenBonus.Model.PredictionModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -92,11 +93,16 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class OpenAIClient {
     private static final String API_URL = "https://api.openai.com/v1/chat/completions";
-    private final OkHttpClient client = new OkHttpClient();
+    OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)   // connection setup timeout
+            .writeTimeout(30, TimeUnit.SECONDS)     // sending data timeout
+            .readTimeout(120, TimeUnit.SECONDS)     // waiting for server response
+            .build();
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Value("${openai.api-key}")
@@ -287,4 +293,73 @@ You are a Bonus Assistant. Follow these rules strictly:
     public void resetConversation(String userId) {
         userConversations.remove(userId);
     }
+
+
+
+
+    public PredictionModel askPredictive(Long cc) throws Exception {
+        String systemPrompt = """
+You are a Bonus Assistant. Always return a JSON object only, no explanation.
+Use this format:
+{
+  "level": string,
+  "bonus": number
+}
+
+Bonus Rules (Master Data – Sales Levels, CC, and Bonus):
+   -  Forever Preferred Customer (Vietnam) → totalCC = 0 | Bonus = 0
+   -  Forever Preferred Customer → totalCC = 1 | Bonus = 0
+   -  Assistant Supervisor → totalCC ≥ 2 and < 25 | Bonus = 5
+   -  Supervisor → totalCC ≥ 25 and < 60 | Bonus = 8
+   -  Assistant Manager → totalCC ≥ 60 and < 120 | Bonus = 13
+   -  Unrecognized Manager → totalCC ≥ 120 and < 150 | Bonus = 18
+   -  Recognized Manager → totalCC ≥ 150 | Bonus = 18
+   -  Same as above, bonus remains 18
+""";
+
+        String userMessage = "What will be the Level and bonus % if I have cc of " + cc;
+
+        Map<String, Object> payload = Map.of(
+                "model", model,
+                "messages", List.of(
+                        Map.of("role", "system", "content", systemPrompt),
+                        Map.of("role", "user", "content", userMessage)
+                ),
+                "temperature", 0.2
+        );
+
+        String json = mapper.writeValueAsString(payload);
+
+        RequestBody body = RequestBody.create(json, MediaType.parse("application/json"));
+        Request request = new Request.Builder()
+                .url(API_URL)
+                .header("Authorization", "Bearer " + apiKey)
+                .post(body)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new RuntimeException("OpenAI API failed. Status: " + response.code() +
+                        ", body: " + (response.body() != null ? response.body().string() : "empty"));
+            }
+
+            String responseBody = response.body().string();
+            Map<?, ?> map = mapper.readValue(responseBody, Map.class);
+
+            List<?> choices = (List<?>) map.get("choices");
+            if (choices == null || choices.isEmpty()) {
+                return null;
+            }
+
+            Map<?, ?> firstChoice = (Map<?, ?>) choices.get(0);
+            Map<?, ?> message = (Map<?, ?>) firstChoice.get("message");
+
+            String content = (String) message.get("content"); // <-- JSON string from model
+
+            // Convert JSON string into PredictionModel
+            return mapper.readValue(content, PredictionModel.class);
+        }
+    }
+
+
 }

@@ -1,6 +1,7 @@
 package com.example.nextgenBonus.Service;
 
 import com.example.nextgenBonus.Client.OpenAIClient;
+import com.example.nextgenBonus.Model.PredictionModel;
 import org.springframework.stereotype.Service;
 
 //@Service
@@ -59,6 +60,15 @@ public class OpenAIService {
     public String ask(String userId, String prompt) {
         try {
             return openAIClient.ask(userId, prompt);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error communicating with OpenAI", e);
+        }
+    }
+
+    public PredictionModel askPredictive(Long cc) {
+        try {
+            return openAIClient.askPredictive(cc);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Error communicating with OpenAI", e);
